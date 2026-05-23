@@ -1,0 +1,648 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Instagram, Sparkles, Sun, Moon, X, ChevronRight, ChevronLeft
+} from 'lucide-react';
+
+// --- ÍCONE PERSONALIZADO DO WHATSAPP ---
+const WhatsAppIcon = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.405-.883-.733-1.48-1.638-1.653-1.935-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+  </svg>
+);
+
+// --- CONFIGURAÇÕES E DADOS ---
+const WHATSAPP_NUMBER = "5581992064543"; 
+const WHATSAPP_BASE_MSG = "Olá! Vim pelo site e quero o orçamento deste produto";
+const WHATSAPP_GENERIC_MSG = "Olá! Gostaria de falar com vocês.";
+
+const CATEGORIES = [
+  { id: 'copos', name: 'Copos Térmicos', desc: 'Copos térmicos personalizados com gravação a laser (360ml e 473ml).' },
+  { id: 'garrafas', name: 'Garrafas térmicas', desc: 'Garrafas térmicas personalizadas para presentes, empresas e uso diário.' },
+  { id: '360-graus', name: 'Gravação 360º', desc: 'Produtos exclusivos com gravação a laser em toda a volta (360 graus).' },
+  { id: 'foto-gravacao', name: 'Foto Gravação', desc: 'Gravação a laser de fotografias com altíssima precisão e detalhes.' },
+  { id: 'kit-churrasco', name: 'Kit churrasco', desc: 'Kits personalizados para presente, datas comemorativas e brindes.' },
+  { id: 'porta-joias', name: 'Porta jóias', desc: 'Porta jóias personalizados com acabamento elegante.' },
+  { id: 'tabuas', name: 'Tábuas de madeira', desc: 'Tábuas de madeira personalizadas com gravação a laser.' }
+];
+
+const STORY_IMAGES = [
+  'https://i.imgur.com/s6tjcVa.mp4',
+  'https://i.imgur.com/CPkUXA2.mp4'
+];
+
+const WORK_IMAGES = [
+  'https://i.imgur.com/70WrggZ.jpg',
+  'https://i.imgur.com/SzorQhA.jpg',
+  'https://i.imgur.com/ovnrYLT.jpg',
+  'https://i.imgur.com/XLYQLn3.jpg',
+  'https://i.imgur.com/70WrggZ.jpg',
+  'https://i.imgur.com/SzorQhA.jpg',
+  'https://i.imgur.com/ovnrYLT.jpg',
+  'https://i.imgur.com/XLYQLn3.jpg',
+];
+
+const PRODUCTS_DB = {
+  'copos': [
+    { id: 'c4_1', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/HV7R6RH.jpg', size: '473ml' },
+    { id: 'c4_2', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/eSeV7Vh.jpg', size: '473ml' },
+    { id: 'c4_3', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/j1Ogs8k.jpg', size: '473ml' },
+    { id: 'c4_4', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/QFUHmsb.jpg', size: '473ml' },
+    { id: 'c4_5', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/P0PiCGF.jpg', size: '473ml' },
+    { id: 'c4_6', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/xTjeQlE.jpg', size: '473ml' },
+    { id: 'c4_7', name: 'Copo Térmico 473ml', img: 'https://i.imgur.com/ERv3Yh9.jpg', size: '473ml' },
+    { id: 'c3_1', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/9855dPS.jpg', size: '360ml' },
+    { id: 'c3_2', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/3qFSnAv.jpg', size: '360ml' },
+    { id: 'c3_3', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/EzUgiWo.jpg', size: '360ml' },
+    { id: 'c3_4', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/xHv8944.jpg', size: '360ml' },
+    { id: 'c3_5', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/qrvGA3c.jpg', size: '360ml' },
+    { id: 'c3_6', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/r1F59Rx.jpg', size: '360ml' },
+    { id: 'c3_7', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/kTwT8L0.jpg', size: '360ml' },
+    { id: 'c3_8', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/RryTRd2.jpg', size: '360ml' },
+    { id: 'c3_9', name: 'Copo Térmico 360ml', img: 'https://i.imgur.com/j79S59e.jpg', size: '360ml' },
+  ],
+  '360-graus': [
+    { id: '360_1', name: 'Gravação 360º Exclusiva', img: 'https://i.imgur.com/2Arwzex.mp4', size: 'Arte Completa' },
+    { id: '360_2', name: 'Arte 360º Premium', img: 'https://i.imgur.com/7TCKhuk.mp4', size: 'Arte Completa' },
+    { id: '360_3', name: 'Gravação 360º Especial', img: 'https://i.imgur.com/9A4PZQ7.mp4', size: 'Arte Completa' },
+    { id: '360_4', name: 'Gravação 360º Detalhada', img: 'https://i.imgur.com/VzM0Gyp.mp4', size: 'Arte Completa' }
+  ],
+  'garrafas': [
+    { id: 'g400_1', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/LDbUluF.png', size: '400ml' },
+    { id: 'g400_2', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/ffDP92P.png', size: '400ml' },
+    { id: 'g400_3', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/oT9BT3O.png', size: '400ml' },
+    { id: 'g400_4', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/EnXXzv1.png', size: '400ml' },
+    { id: 'g400_5', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/bqtqlZt.png', size: '400ml' },
+    { id: 'g400_6', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/JqZ6HUJ.png', size: '400ml' },
+    { id: 'g400_7', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/AJxNVhz.png', size: '400ml' },
+    { id: 'g400_8', name: 'Garrafa Térmica 400ml', img: 'https://i.imgur.com/jVnOQF2.png', size: '400ml' },
+    { id: 'g600_1', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/psvnNEb.png', size: '600ml' },
+    { id: 'g600_2', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/c9cfzy3.png', size: '600ml' },
+    { id: 'g600_3', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/t2VKOii.png', size: '600ml' },
+    { id: 'g600_4', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/G8wPyek.png', size: '600ml' },
+    { id: 'g600_5', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/qQD6wCa.png', size: '600ml' },
+    { id: 'g600_6', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/fYbnKUQ.png', size: '600ml' },
+    { id: 'g600_7', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/5nnKIlT.png', size: '600ml' },
+    { id: 'g600_8', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/j8JEVFM.png', size: '600ml' },
+    { id: 'g600_9', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/JXsTnli.png', size: '600ml' },
+    { id: 'g600_10', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/je8DkpR.png', size: '600ml' },
+    { id: 'g600_11', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/WZXmdia.png', size: '600ml' },
+    { id: 'g600_12', name: 'Garrafa Térmica 600ml', img: 'https://i.imgur.com/CNrkZes.png', size: '600ml' },
+    { id: 'g750_1', name: 'Garrafa Térmica 750ml', img: 'https://i.imgur.com/VMo5R1R.png', size: '750ml' },
+    { id: 'g750_2', name: 'Garrafa Térmica 750ml', img: 'https://i.imgur.com/K6rENed.png', size: '750ml' },
+  ],
+  'kit-churrasco': [
+    { id: 'kn_1', name: 'Kit Churrasco Premium', img: 'https://i.imgur.com/4kON5cD.jpeg' },
+    { id: 'kn_2', name: 'Kit Churrasco Exclusivo', img: 'https://i.imgur.com/55COugr.jpeg' },
+    { id: 'kn_3', name: 'Kit Churrasco Especial', img: 'https://i.imgur.com/jYZNwaA.jpeg' },
+  ],
+  'porta-joias': [
+    { id: 'p1', name: 'Porta Jóias Clássico', img: 'https://i.imgur.com/iFJCFe8.jpeg' },
+    { id: 'p2', name: 'Estojo Aveludado', img: 'https://i.imgur.com/O284ISc.jpeg' },
+  ],
+  'tabuas': [
+    { id: 't1', name: 'Tábua Rústica Premium', img: 'https://i.imgur.com/B08JnuQ.jpeg' },
+    { id: 't2', name: 'Tábua Rústica Exclusiva', img: 'https://i.imgur.com/OIfx7tp.jpeg' },
+    { id: 't3', name: 'Tábua Rústica Especial', img: 'https://i.imgur.com/8zTG01o.jpeg' },
+  ],
+  'foto-gravacao': [
+    { id: 'fg_1', name: 'Foto Gravação Exclusiva', img: 'https://i.imgur.com/s6tjcVa.mp4' },
+    { id: 'fg_2', name: 'Foto Gravação Premium', img: 'https://i.imgur.com/CPkUXA2.mp4' }
+  ]
+};
+
+// --- COMPONENTES ---
+const Button = ({ children, onClick, primary = true, className = "", icon: Icon }) => {
+  const baseStyle = "inline-flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-3 rounded-full font-medium transition-all duration-300 w-full sm:w-auto text-sm md:text-base cursor-pointer";
+  const primaryStyle = "bg-[#25D366] text-white hover:bg-[#20bd5a] border-none btn-whatsapp-pulse";
+  const secondaryStyle = "bg-transparent border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white";
+  const combinedClass = `${baseStyle} ${primary ? primaryStyle : secondaryStyle} ${className}`;
+
+  return (
+    <button onClick={onClick} className={combinedClass}>
+      {Icon && <Icon size={18} className="md:w-5 md:h-5" />}
+      {children}
+    </button>
+  );
+};
+
+export default function App() {
+  const [currentView, setCurrentView] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(true); 
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const STORY_DURATION = 4000;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentView, selectedCategory]);
+
+  useEffect(() => {
+    if (currentView !== 'home') return;
+    const timer = setInterval(() => {
+      setActiveStoryIndex((prevIndex) => (prevIndex + 1) % STORY_IMAGES.length);
+    }, STORY_DURATION);
+    return () => clearInterval(timer);
+  }, [currentView, activeStoryIndex]);
+
+  const handleNextStory = (e) => {
+    e.stopPropagation();
+    setActiveStoryIndex((prev) => (prev + 1) % STORY_IMAGES.length);
+  };
+
+  const handlePrevStory = (e) => {
+    e.stopPropagation();
+    setActiveStoryIndex((prev) => (prev - 1 + STORY_IMAGES.length) % STORY_IMAGES.length);
+  };
+
+  const navigateToCategory = (cat) => {
+    setSelectedCategory(cat);
+    setCurrentView('category');
+    setSelectedProduct(null);
+  };
+
+  const navigateToHome = () => {
+    setCurrentView('home');
+    setSelectedCategory(null);
+    setSelectedProduct(null);
+  };
+
+  const getWhatsAppLink = (productName = "") => {
+    const text = productName 
+      ? `${WHATSAPP_BASE_MSG}: ${productName}` 
+      : WHATSAPP_BASE_MSG;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  };
+
+  const handleRedirectWhatsApp = (e, productName = "") => {
+    if (e) e.preventDefault();
+    setIsRedirecting(true);
+    
+    setTimeout(() => {
+      setIsRedirecting(false);
+      const url = getWhatsAppLink(productName);
+      
+      const newWindow = window.open(url, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+          window.location.href = url;
+      }
+    }, 1800);
+  };
+
+  const themeClasses = {
+    bgMain: isDarkMode ? 'bg-[#0a0a0a]' : 'bg-[#f8f9fa]',
+    textMain: isDarkMode ? 'text-white' : 'text-slate-900',
+    sidebarBg: isDarkMode ? 'bg-[#121212]' : 'bg-[#ffffff]',
+    sidebarBorder: isDarkMode ? 'border-[#262626]' : 'border-slate-200',
+    navBtnInactiveBg: isDarkMode ? 'hover:bg-[#1a1a1a]' : 'hover:bg-slate-100',
+    navBtnInactiveText: isDarkMode ? 'text-neutral-400' : 'text-slate-600',
+    heroSubtitle: isDarkMode ? 'text-neutral-400' : 'text-slate-500',
+    heroTagBg: isDarkMode ? 'bg-[#171717]' : 'bg-[#f1f5f9]',
+    cardBg: isDarkMode ? 'bg-[#171717]' : 'bg-white',
+    cardBorder: isDarkMode ? 'border-[#262626]' : 'border-slate-200',
+    cardImgBg: isDarkMode ? 'bg-[#0a0a0a]' : 'bg-slate-100',
+    cardInnerBg: isDarkMode ? 'bg-[#0a0a0a]' : 'bg-slate-50',
+    textMuted: isDarkMode ? 'text-neutral-500' : 'text-slate-400',
+    textNormal: isDarkMode ? 'text-neutral-200' : 'text-slate-700',
+  };
+
+  return (
+    <div className={`min-h-screen ${themeClasses.bgMain} ${themeClasses.textMain} font-sans selection:bg-[#D4AF37] selection:text-black transition-colors duration-300 flex overflow-x-hidden relative`}>
+      
+      {}
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
+          
+          .font-elegant { font-family: 'Playfair Display', serif; }
+
+          @keyframes story-progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+          }
+          .animate-story-progress {
+            animation: story-progress ${STORY_DURATION}ms linear forwards;
+          }
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+          
+          @keyframes pulse-whatsapp {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+          }
+          .btn-whatsapp-pulse { animation: pulse-whatsapp 2s infinite ease-in-out; }
+
+          @keyframes laser-sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+          }
+          .laser-effect-container { position: relative; overflow: hidden; }
+          .laser-effect-container::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            z-index: 0; animation: laser-sweep 3s infinite linear;
+          }
+          .laser-effect-line {
+            position: absolute; bottom: 0; left: 0; width: 50%; height: 2px;
+            background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+            animation: laser-sweep 3s infinite linear; box-shadow: 0 0 8px #D4AF37; z-index: 10;
+          }
+
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-scroll { animation: scroll 20s linear infinite; }
+          .animate-scroll:hover { animation-play-state: paused; }
+
+          /* ANIMAÇÃO DO LASER DO WHATSAPP */
+          @keyframes laser-scan-vertical {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+          }
+          .animate-laser-scan-vertical {
+            animation: laser-scan-vertical 1.2s ease-in-out infinite alternate;
+          }
+        `}
+      </style>
+
+      {}
+      {/* --- MENU LATERAL (SEMPRE ABERTO E RESPONSIVO) --- */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-[100px] sm:w-[130px] md:w-64 ${themeClasses.sidebarBg} border-r ${themeClasses.sidebarBorder} flex flex-col transition-all duration-300 ease-in-out shadow-xl md:shadow-none`}>
+        <div className={`p-3 md:p-6 border-b ${themeClasses.sidebarBorder} flex flex-col items-center gap-2 md:gap-3`}>
+          <img src="https://i.imgur.com/fWLcqLl.jpg" alt="Logo" className="w-12 h-12 md:w-24 md:h-24 rounded-full object-cover shadow-[0_0_10px_rgba(212,175,55,0.4)]" />
+          <div className="text-center w-full">
+            <span className="font-semibold text-[9px] md:text-sm tracking-widest uppercase block text-gray-300 leading-none">Tudo Com</span>
+            <span className="font-bold text-[11px] md:text-2xl text-[#D4AF37] block mt-0.5 md:mt-1 drop-shadow-md leading-none">Laser</span>
+          </div>
+
+          {/* Botões de Tema e Instagram abaixo da Logo */}
+          <div className="w-full flex flex-row gap-1.5 md:gap-2 mt-1 md:mt-2">
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`flex-1 flex flex-col md:flex-row justify-center items-center gap-1 md:gap-1.5 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-colors font-medium ${isDarkMode ? 'text-neutral-300 hover:bg-[#1a1a1a] bg-[#1a1a1a]/50' : 'text-slate-600 hover:bg-slate-200 bg-slate-100'}`}
+            >
+              {isDarkMode ? <Sun size={14} className="md:w-4 md:h-4" /> : <Moon size={14} className="md:w-4 md:h-4" />}
+              <span className="text-[8px] md:text-xs leading-none">{isDarkMode ? 'Claro' : 'Escuro'}</span>
+            </button>
+            <a 
+              href="https://www.instagram.com/tudocomlaser/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`flex-1 flex flex-col md:flex-row justify-center items-center gap-1 md:gap-1.5 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-colors font-medium ${isDarkMode ? 'text-neutral-300 hover:bg-[#1a1a1a] bg-[#1a1a1a]/50' : 'text-slate-600 hover:bg-slate-200 bg-slate-100'}`}
+            >
+              <Instagram size={14} className="md:w-4 md:h-4" />
+              <span className="text-[8px] md:text-xs leading-none">Insta</span>
+            </a>
+          </div>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto py-4 md:py-6 px-2 md:px-4 space-y-1.5 md:space-y-2 no-scrollbar">
+          <button
+            onClick={navigateToHome}
+            className={`w-full text-center md:text-left px-1 md:px-4 py-2.5 md:py-3.5 rounded-lg md:rounded-xl text-[10px] md:text-sm font-bold transition-all duration-200 flex flex-col md:flex-row items-center gap-1 md:gap-3 leading-tight
+              ${currentView === 'home' 
+                ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 laser-effect-container' 
+                : `border border-transparent ${themeClasses.navBtnInactiveText} ${themeClasses.navBtnInactiveBg}`
+              }
+            `}
+          >
+            {currentView === 'home' && <div className="laser-effect-line"></div>}
+            <div className={`shrink-0 w-1.5 h-1.5 rounded-full hidden md:block ${currentView === 'home' ? 'bg-[#D4AF37]' : 'bg-transparent'}`}></div>
+            <span className="relative z-20">Início</span>
+          </button>
+
+          <div className="h-2 md:h-4"></div>
+          
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => navigateToCategory(cat)}
+              className={`w-full text-center md:text-left px-1 md:px-4 py-2.5 md:py-3.5 rounded-lg md:rounded-xl text-[10px] md:text-sm font-medium transition-all duration-200 flex flex-col md:flex-row items-center gap-1 md:gap-3 leading-tight
+                ${selectedCategory?.id === cat.id 
+                  ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 laser-effect-container' 
+                  : `border border-transparent ${themeClasses.navBtnInactiveText} ${themeClasses.navBtnInactiveBg}`
+                }
+              `}
+            >
+              {selectedCategory?.id === cat.id && <div className="laser-effect-line"></div>}
+              <div className={`shrink-0 w-1.5 h-1.5 rounded-full hidden md:block ${selectedCategory?.id === cat.id ? 'bg-[#D4AF37]' : 'bg-transparent'}`}></div>
+              <span className="relative z-20 line-clamp-2">{cat.name}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* --- ÁREA PRINCIPAL --- */}
+      <main className="flex-1 w-full ml-[100px] sm:ml-[130px] md:ml-64 flex flex-col min-h-screen transition-all duration-300">
+        
+        <div className="flex-1 w-full max-w-5xl mx-auto px-3 sm:px-6 md:px-8 py-6 md:py-12">
+          
+          {currentView === 'home' ? (
+            // --- HOME VIEW ---
+            <div className="animate-in fade-in duration-500 flex flex-col items-center justify-center gap-6 md:gap-12 pt-2 md:pt-4">
+              
+              <div className="w-full text-center space-y-2 md:space-y-4 max-w-2xl mx-auto">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-elegant italic font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-[#F3E5AB] to-[#D4AF37] pb-2 drop-shadow-sm">
+                  Destaques
+                </h1>
+                <p className="text-lg md:text-2xl font-medium text-[#D4AF37] flex items-center justify-center gap-2 animate-pulse">
+                  Dia dos namorados chegando <span className="text-red-500">❤️</span>
+                </p>
+              </div>
+
+              {/* Vitrine Estilo Story */}
+              <div className="shrink-0 flex justify-center py-2 w-full">
+                <button
+                  onClick={(e) => handleRedirectWhatsApp(e, "Destaques")}
+                  className="relative block w-[230px] sm:w-[320px] md:w-[400px] aspect-[9/16] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl bg-[#0a0a0a] group cursor-pointer border-none p-0 text-left"
+                >
+                  <div className="absolute inset-y-0 left-0 w-12 md:w-16 z-30 flex items-center justify-center" onClick={handlePrevStory}>
+                    <div className="bg-black/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm ml-1 md:ml-2 hover:bg-[#D4AF37] transition-colors"><ChevronLeft size={20} className="md:w-6 md:h-6"/></div>
+                  </div>
+                  <div className="absolute inset-y-0 right-0 w-12 md:w-16 z-30 flex items-center justify-center" onClick={handleNextStory}>
+                    <div className="bg-black/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm mr-1 md:mr-2 hover:bg-[#D4AF37] transition-colors"><ChevronRight size={20} className="md:w-6 md:h-6"/></div>
+                  </div>
+
+                  {}
+                  <div className="absolute top-3 md:top-4 left-0 w-full px-3 md:px-4 flex gap-1 z-20">
+                    {STORY_IMAGES.map((_, idx) => (
+                      <div key={idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+                        <div
+                          key={idx === activeStoryIndex ? `active-${idx}` : `inactive-${idx}`}
+                          className={`h-full bg-white rounded-full ${
+                            idx < activeStoryIndex ? 'w-full' : 
+                            idx > activeStoryIndex ? 'w-0' : 
+                            'animate-story-progress'
+                          }`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {STORY_IMAGES.map((media, idx) => (
+                    media.endsWith('.mp4') ? (
+                      <video 
+                        key={idx}
+                        src={media} 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${
+                          idx === activeStoryIndex ? 'opacity-100 z-10 scale-100 group-hover:scale-[1.02]' : 'opacity-0 z-0 scale-105'
+                        }`}
+                      />
+                    ) : (
+                      <img 
+                        key={idx}
+                        src={media} 
+                        alt={`Destaque ${idx + 1}`} 
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${
+                          idx === activeStoryIndex ? 'opacity-100 z-10 scale-100 group-hover:scale-[1.02]' : 'opacity-0 z-0 scale-105'
+                        }`}
+                      />
+                    )
+                  ))}
+                  <div className="absolute top-0 left-0 w-full h-16 md:h-20 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none"></div>
+                </button>
+              </div>
+
+              {/* Carrossel Infinito */}
+              <div className="w-full mt-6 md:mt-12 overflow-hidden">
+                <h2 className="text-2xl md:text-4xl font-elegant italic tracking-wide mb-4 md:mb-6 text-center text-[#D4AF37]">
+                  Nossos Trabalhos
+                </h2>
+                <div className="relative w-full bg-[#111] py-3 md:py-4 rounded-xl md:rounded-2xl flex">
+                  <div className="absolute inset-y-0 left-0 w-8 md:w-20 bg-gradient-to-r from-[#111] to-transparent z-10 pointer-events-none"></div>
+                  <div className="absolute inset-y-0 right-0 w-8 md:w-20 bg-gradient-to-l from-[#111] to-transparent z-10 pointer-events-none"></div>
+                  
+                  <div className="flex w-[200%] animate-scroll">
+                    {WORK_IMAGES.map((img, index) => (
+                      <div 
+                        key={index} 
+                        className="w-[120px] md:w-[200px] shrink-0 px-1.5 md:px-2 cursor-pointer transition-transform hover:scale-105"
+                        onClick={() => setFullscreenImage(img)}
+                      >
+                        <div className="aspect-[3/4] rounded-lg md:rounded-xl overflow-hidden border border-[#222]">
+                          <img src={img} alt="Trabalho" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          ) : (
+            // --- CATEGORY VIEW ---
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-6 md:mb-8 text-center sm:text-left">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-elegant italic font-bold mb-1 md:mb-3 text-[#D4AF37] tracking-wide">{selectedCategory.name}</h1>
+                <p className={`${themeClasses.heroSubtitle} text-xs sm:text-sm md:text-lg`}>{selectedCategory.desc || 'Selecione um produto para expandir'}</p>
+              </div>
+
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
+                {PRODUCTS_DB[selectedCategory.id]?.map((product) => (
+                  <button 
+                    key={product.id} 
+                    onClick={() => setSelectedProduct(product)}
+                    className={`relative w-full aspect-[9/16] rounded-xl md:rounded-2xl overflow-hidden group border ${themeClasses.cardBorder} hover:border-[#D4AF37] transition-all focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-left shadow-sm bg-[#0a0a0a]`}
+                  >
+                    {product.img?.endsWith('.mp4') ? (
+                      <video 
+                        src={product.img} 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                      />
+                    ) : (
+                      <img 
+                        src={product.img} 
+                        alt={product.name} 
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2 md:p-4">
+                      <div className="w-full">
+                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center mb-1.5 md:mb-2 border border-white/20">
+                          <Sparkles size={10} className="md:w-3 md:h-3 text-[#D4AF37]" />
+                        </div>
+                        <h3 className="text-white text-[10px] sm:text-xs md:text-sm font-medium line-clamp-2 leading-tight drop-shadow-md">
+                          {product.name}
+                        </h3>
+                        {product.size && (
+                          <span className="text-[#D4AF37] text-[9px] md:text-[10px] font-bold uppercase mt-0.5 md:mt-1 block">{product.size}</span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {}
+              {(!PRODUCTS_DB[selectedCategory.id] || PRODUCTS_DB[selectedCategory.id].length === 0) && (
+                <div className={`text-center py-12 md:py-16 ${themeClasses.cardBg} rounded-xl md:rounded-2xl border ${themeClasses.cardBorder}`}>
+                  <p className={`${themeClasses.heroSubtitle} text-xs md:text-lg`}>Novos produtos em breve!</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {}
+      {/* --- BOTÃO FLUTUANTE WHATSAPP --- */}
+      <button 
+        onClick={(e) => handleRedirectWhatsApp(e)}
+        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[45] flex items-center gap-2 bg-[#25D366] text-white px-4 py-3 md:px-5 md:py-3.5 rounded-full font-semibold shadow-[0_4px_15px_rgba(37,211,102,0.4)] hover:bg-[#20bd5a] transition-all duration-300 border-none btn-whatsapp-pulse cursor-pointer"
+      >
+        <WhatsAppIcon size={20} className="md:w-6 md:h-6" />
+        <span className="text-sm md:text-base hidden sm:inline">Faça o seu orçamento</span>
+        <span className="text-[11px] sm:hidden font-bold">Orçamento</span>
+      </button>
+
+      {}
+      {/* --- MODAL DE PRODUTO --- */}
+      {selectedProduct && !fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedProduct(null);
+          }}
+        >
+          <div className={`relative w-full max-w-[280px] sm:max-w-sm flex flex-col max-h-[90vh] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl ${themeClasses.cardBg} border ${themeClasses.cardBorder}`}>
+            
+            <button 
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/80 backdrop-blur-md transition-colors"
+            >
+              <X size={16} className="md:w-[18px] md:h-[18px]" />
+            </button>
+
+            <div 
+              className={`relative w-full h-[240px] md:h-80 shrink-0 cursor-pointer group ${themeClasses.cardImgBg}`}
+              onClick={() => setFullscreenImage(selectedProduct.img)}
+            >
+              {selectedProduct.img?.endsWith('.mp4') ? (
+                <video 
+                  src={selectedProduct.img} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
+                <img 
+                  src={selectedProduct.img} 
+                  alt={selectedProduct.name} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 transition-opacity">
+                <span className="bg-black/60 text-white text-[10px] md:text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full backdrop-blur-sm">Tocar para ampliar</span>
+              </div>
+              <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-black/60 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-[9px] md:text-[10px] font-medium text-[#D4AF37] flex items-center gap-1.5">
+                <Sparkles size={10} className="md:w-3 md:h-3" /> Personalizável
+              </div>
+            </div>
+
+            <div className="p-4 md:p-5 flex flex-col flex-1 overflow-y-auto no-scrollbar">
+              <h3 className={`text-base md:text-xl font-bold mb-3 md:mb-4 ${themeClasses.textMain} leading-tight`}>{selectedProduct.name}</h3>
+              
+              {selectedProduct.size && (
+                <div className={`space-y-2 md:space-y-3 mb-4 md:mb-6 ${themeClasses.cardInnerBg} p-3 md:p-4 rounded-xl md:rounded-2xl border ${themeClasses.cardBorder}`}>
+                  <div className="flex justify-between items-center text-xs md:text-sm">
+                    <span className={themeClasses.textMuted}>Capacidade:</span> 
+                    <span className={`${themeClasses.textNormal} font-medium`}>{selectedProduct.size}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-auto pt-2">
+                <Button 
+                  onClick={(e) => handleRedirectWhatsApp(e, selectedProduct.name)} 
+                  icon={WhatsAppIcon}
+                  className="w-full text-xs md:text-sm"
+                  primary={true}
+                >
+                  Pedir orçamento
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {/* --- MODAL IMAGEM TELA CHEIA --- */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <button 
+            onClick={() => setFullscreenImage(null)}
+            className="absolute top-4 right-4 md:top-8 md:right-8 z-50 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-colors"
+          >
+            <X size={20} className="md:w-6 md:h-6" />
+          </button>
+          {fullscreenImage.endsWith('.mp4') ? (
+            <video 
+              src={fullscreenImage} 
+              controls
+              autoPlay
+              loop
+              playsInline
+              className="max-w-full max-h-full object-contain p-2 md:p-8"
+            />
+          ) : (
+            <img 
+              src={fullscreenImage} 
+              alt="Ampliada" 
+              className="max-w-full max-h-full object-contain p-2 md:p-8"
+            />
+          )}
+        </div>
+      )}
+
+      {/* --- OVERLAY DE ANIMAÇÃO PREMIUM DO WHATSAPP (LASER SCAN) --- */}
+      {isRedirecting && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#050505]/85 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="relative w-24 h-24 md:w-32 md:h-32 flex items-center justify-center mb-6">
+            <WhatsAppIcon size={64} className="text-[#25D366] drop-shadow-[0_0_15px_rgba(37,211,102,0.6)]" />
+            
+            {/* Feixe de Laser Descendo */}
+            <div className="absolute inset-0 overflow-hidden rounded-full border border-white/5 bg-black/20 shadow-inner">
+              <div className="absolute left-0 w-full h-[3px] bg-[#D4AF37] shadow-[0_0_15px_3px_#D4AF37] animate-laser-scan-vertical"></div>
+            </div>
+          </div>
+          
+          <h2 className="text-xl md:text-3xl font-elegant italic text-[#D4AF37] tracking-wide mb-2 drop-shadow-md">
+            Preparando seu atendimento...
+          </h2>
+          <p className="text-neutral-400 text-xs md:text-sm tracking-widest uppercase">
+            Redirecionando para o WhatsApp seguro
+          </p>
+        </div>
+      )}
+
+    </div>
+  );
+}
